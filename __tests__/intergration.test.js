@@ -90,3 +90,51 @@ describe("GET /api/articles/:article_id", () => {
         })
     });
 })
+
+describe('GET /api/articles', () => {
+    test('200 status and returns all articles without a body property and a new property comment_count', () => {
+        return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then((response) => {
+            console.log(response.body.rows)
+            const articles = response.body.rows
+         // expect(articles).toHaveLength(13)
+         articles.forEach((article) => {
+            
+            expect(article).toMatchObject({
+                article_id: expect.any(Number),
+                title: expect.any(String),
+                topic: expect.any(String),
+                author: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                article_img_url: expect.any(String),
+                comment_count: expect.any(String)
+                
+            })
+         })
+
+        } )
+    });
+
+    test('200 status and returns all articles sorted by date in decending Order', () => {
+        return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then((response) => {
+            const articles = response.body.rows;
+            expect(articles[0].article_id).toBe(3)
+
+        })     
+    });
+    test('404 status and responds with message', () => {
+        return request(app)
+        .get("/api/article")
+        .expect(404)
+        .then(({ body }) => {
+            const { msg } = body
+            expect(msg).toBe("Could not find page")
+        })
+    });
+});
