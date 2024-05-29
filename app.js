@@ -1,7 +1,8 @@
 const express = require("express");
 const getTopics = require("./controllers/topic.controller")
 const allEndpoints = require("./controllers/allEndpoints.controller")
-const getArticleID = require("./controllers/articles.controller")
+const {getArticleID, getArticles} = require("./controllers/articles.controller")
+
 
 
 
@@ -16,9 +17,14 @@ app.get("/api", allEndpoints);
 
 app.get("/api/topics", getTopics);
 
-app.get("/api/articles/:article_id", getArticleID)
+app.get("/api/articles", getArticles) // not done yet
 
+app.get("/api/articles/:article_id", getArticleID);
 
+// 404 all
+ app.all("*", (req, res, next) => {
+   res.status(404).send({ msg: "Could not find page"})
+ })
 
 
 //Error Handling middleware
