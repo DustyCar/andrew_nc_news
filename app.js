@@ -1,14 +1,10 @@
 const express = require("express");
 const getTopics = require("./controllers/topic.controller")
 const allEndpoints = require("./controllers/allEndpoints.controller")
-const {getArticleID, getArticles} = require("./controllers/articles.controller")
-
-
-
+const {getArticleID, getArticles, getComments} = require("./controllers/articles.controller")
 
 
 const app = express();
-
 
 
 app.use(express.json());
@@ -17,9 +13,13 @@ app.get("/api", allEndpoints);
 
 app.get("/api/topics", getTopics);
 
-app.get("/api/articles", getArticles) // not done yet
+app.get("/api/articles", getArticles); 
 
 app.get("/api/articles/:article_id", getArticleID);
+
+app.get("/api/articles/:article_id/comments", getComments)
+
+
 
 // 404 all
  app.all("*", (req, res, next) => {
