@@ -4,6 +4,7 @@ const app = require("../app");
 const seed = require("../db/seeds/seed");
 const db = require("../db/connection");
 const endpoints = require("../endpoints.json")
+require("jest-sorted")
 
 
 beforeEach(() => {
@@ -68,7 +69,7 @@ describe("GET /api/articles/:article_id", () => {
                 created_at: expect.any(String),
                 votes: expect.any(Number),
                 article_img_url: expect.any(String)
-            }) 
+            })
         })
     })
     test('400 status returns with an ERROR when article_id is an invalid type', () => {
@@ -97,7 +98,7 @@ describe('GET /api/articles', () => {
         .get("/api/articles")
         .expect(200)
         .then((response) => {
-            console.log(response.body.rows)
+            
             const articles = response.body.rows
          // expect(articles).toHaveLength(13)
          articles.forEach((article) => {
@@ -137,4 +138,65 @@ describe('GET /api/articles', () => {
             expect(msg).toBe("Could not find page")
         })
     });
+});
+
+
+describe(' GET /api/articles/:article_id/comments', () => {
+    test('200 status and returns an array of comments for the given article_id', () => {
+        return request(app)
+        .get("/api/articles/1/comments") 
+        .expect(200)
+       .then(({ body }) => {
+           const { comments } = body
+           comments.forEach((comment) => {
+            
+            expect(comment.article_id).toBe(1)
+            expect(comment).toMatchObject({
+                comment_id: expect.any(Number),
+                body: expect.any(String),
+                article_id: expect.any(Number),
+                author: expect.any(String),
+                votes: expect.any(Number),
+                created_at: expect.any(String)
+            })
+           })
+        })    
+     });
+     test('200 Sorted in order of most recent comment first', () => {
+        return request(app)
+        .get("/api/articles/1/comments")
+        .expect(200)
+        .then(({body}) => {
+            const { comments } = body
+            expect(comments).toBeSortedBy('created_at', { descending: true })
+        })
+     });
+     test('404 status returns with an ERROR when article_id is valid but does not exist', () => {
+        return request(app)
+        .get("/api/articles/999/comments")
+        .expect(404)
+        .then(({ body }) => {
+            const { msg } = body
+            expect(msg).toBe("Not Found")
+        })
+    });
+    test('400 status returns with an ERROR when article_id is an invalid type', () => {
+        return request(app)
+        .get("/api/articles/invalid_type/comments")
+        .expect(400)
+        .then(({ body }) => {
+            const { msg } = body
+            expect(msg).toBe("Bad Request")      
+        })
+    });
+    test('404 status and responds with ERROR message when spelling is wrong', () => {
+        return request(app)
+        .get("/api/article/1/comment")
+        .expect(404)
+        .then(({ body }) => {
+            const { msg } = body
+            expect(msg).toBe("Could not find page")
+        })
+    });
+
 });
