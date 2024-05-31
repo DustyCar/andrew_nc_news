@@ -11,7 +11,10 @@ beforeEach(() => {
     return seed(data)
   })
   
-  afterAll(() => db.end())
+ // afterAll(() => db.end())
+ afterAll(() => {
+    return db.end(); // Ensure this properly closes your DB connection
+});
 
 
 describe("GET /api/topics", () => {
@@ -392,9 +395,13 @@ describe('POST /api/articles/:article_id/comments', () => {
                 expect(msg).toBe("Bad Request")      
             })
         });
-
-
-        
-
-
  });
+
+  describe('DELETE /api/comments/:comment_id', () => {
+     test('200: deletes chosen comment by comment_id', () => {
+       return request(app)
+         .delete('/api/comments/1')
+         .expect(204)
+        
+     });
+  });
