@@ -1,4 +1,4 @@
-const {fetchArticleID, fetchArticles, fetchComments, addCommentToDatabase, dbPatchArticle} = require("../models/articles.model")
+const {fetchArticleID, fetchArticles, fetchComments, addCommentToDatabase, dbPatchArticle, dbDeleteComment} = require("../models/articles.model")
 
 
 exports.getArticles = (req, res, next) => {
@@ -50,6 +50,15 @@ exports.patchArticle = (req, res, next) => {
     }).catch(next)
 
 
+}
+
+
+exports.deleteComment = (req, res, next) => {
+    const { comment_id } = req.params
+
+    return dbDeleteComment(comment_id).then(() => {
+        res.status(204).end()
+    }).catch(next)
 }
 
 
