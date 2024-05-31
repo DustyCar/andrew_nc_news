@@ -289,6 +289,112 @@ describe('POST /api/articles/:article_id/comments', () => {
         })
 
     });
-
-
 });
+
+ describe('PATCH /api/articles/:article_id', () => {
+
+         test('200 status updates the vote property on an article', () => {
+             const patchRequest = {inc_votes: 100}
+
+             return request(app)
+             .patch("/api/articles/1")
+             .send(patchRequest)
+             .expect(200)
+             .then(({ body }) => {
+                
+                const patchedArticle = body.article
+                
+              
+                expect(patchedArticle).toMatchObject({
+                    article_id: 1,
+                    title: expect.any(String),
+                    topic: expect.any(String),
+                    author: expect.any(String),
+                    body: expect.any(String),
+                    created_at: expect.any(String),
+                    votes: 200,
+                    article_img_url: expect.any(String)
+                })
+            })
+         });
+         test('200 status updates the vote property on an article with a minus vote number', () => {
+            const patchRequest = {inc_votes: -101}
+
+            return request(app)
+            .patch("/api/articles/1")
+            .send(patchRequest)
+            .expect(200)
+            .then(({ body }) => {
+              
+               const patchedArticle = body.article
+               
+             
+               expect(patchedArticle).toMatchObject({
+                   article_id: 1,
+                   title: expect.any(String),
+                   topic: expect.any(String),
+                   author: expect.any(String),
+                   body: expect.any(String),
+                   created_at: expect.any(String),
+                   votes: -1,
+                   article_img_url: expect.any(String)
+               })
+           })
+        });
+        //SAD PATH
+        test('400: invalid_id', () => {
+            const patchRequest = {inc_votes: 100}
+
+            return request(app)
+            .patch("/api/articles/999")
+            .send(patchRequest)
+            .expect(400)
+            .then(({ body }) => {
+                const { msg } = body
+                expect(msg).toBe("Not Found")      
+            })
+        });
+
+        test('404: non existent id', () => {
+            const patchRequest = {inc_votes: 100}
+
+            return request(app)
+            .patch("/api/articles")
+            .send(patchRequest)
+            .expect(404)
+            .then(({ body }) => {
+                const { msg } = body
+                expect(msg).toBe("Could not find page")      
+            })
+        });
+        test('400: Empty body', () => {
+            const patchRequest = {}
+
+            return request(app)
+            .patch("/api/articles/1")
+            .send(patchRequest)
+            .expect(400)
+            .then(({ body }) => {
+                const { msg } = body
+                expect(msg).toBe("Bad Request")      
+            })
+        });
+
+        test('400: Incorrect body', () => {
+            const patchRequest = {inc_votes: "Incorrect"}
+
+            return request(app)
+            .patch("/api/articles/1")
+            .send(patchRequest)
+            .expect(400)
+            .then(({ body }) => {
+                const { msg } = body
+                expect(msg).toBe("Bad Request")      
+            })
+        });
+
+
+        
+
+
+ });
