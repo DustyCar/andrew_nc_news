@@ -198,5 +198,97 @@ describe(' GET /api/articles/:article_id/comments', () => {
             expect(msg).toBe("Could not find page")
         })
     });
+});
+
+describe('POST /api/articles/:article_id/comments', () => {
+    test('201 status: Posts a new comment', () => {
+        const commentToAdd = {
+            username: "lurker",
+            body: "test comment for body"
+        }
+
+        return request(app) 
+        .post("/api/articles/2/comments")
+        .send(commentToAdd)
+        .expect(201)
+        .then(({body}) => {
+
+            const {newComment} = body
+
+            expect(newComment).toMatchObject({
+                comment_id: expect.any(Number),
+                body: "test comment for body",
+                votes: expect.any(Number),
+                author: "lurker",
+                article_id: 2,
+                created_at: expect.any(String)
+            })
+        })
+    });
+    test('400 status returns with an ERROR when article_id is an invalid type', () => {
+        const commentToAdd = {
+            username: "lurker",
+            body: "test comment for body"
+        }
+
+        return request(app)
+        .post("/api/articles/invalid_type/comments")
+        .send(commentToAdd)
+        .expect(400)
+        .then(({ body }) => {
+            const { msg } = body
+            expect(msg).toBe("Bad Request")      
+        })
+    });
+    test('400 status invalid username', () => {
+        const commentToAdd = {
+            username: "invalid username",
+            body: "test comment for body"
+        }
+
+        return request(app)
+        .post("/api/articles/invalid_type/comments")
+        .send(commentToAdd)
+        .expect(400)
+        .then(({ body }) => {
+            const { msg } = body
+            expect(msg).toBe("Bad Request")      
+        })
+
+    });
+
+    test('400 status invalid type username', () => {
+        const commentToAdd = {
+            username: 1,
+            body: "test comment for body"
+        }
+
+        return request(app)
+        .post("/api/articles/invalid_type/comments")
+        .send(commentToAdd)
+        .expect(400)
+        .then(({ body }) => {
+            const { msg } = body
+            expect(msg).toBe("Bad Request")      
+        })
+
+    });
+    test('400 status invalid type body', () => {
+        const commentToAdd = {
+            username: "lurker",
+            body: 1
+        }
+
+        return request(app)
+        .post("/api/articles/1/comments")
+        .send(commentToAdd)
+        .expect(400)
+        .then(({ body }) => {
+            const { msg } = body
+            expect(msg).toBe("Bad Request")      
+        })
+
+    });
+
 
 });
