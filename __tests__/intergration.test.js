@@ -398,10 +398,34 @@ describe('POST /api/articles/:article_id/comments', () => {
  });
 
   describe('DELETE /api/comments/:comment_id', () => {
-     test('200: deletes chosen comment by comment_id', () => {
+     test('204: deletes chosen comment by comment_id', () => {
        return request(app)
+
          .delete('/api/comments/1')
-         .expect(204)
-        
+         .expect(204)   
+
      });
+
+     test('404: responds with an error when deleting a non-existent comment', () => {
+        return request(app)
+          .delete('/api/comments/999') 
+          .expect(404)
+          .then(({ body }) => {
+
+        expect(body.msg).toBe('Comment not found');
+        
+          });
+      });
+
+      test('400: responds with an error when given an invalid comment_id', () => {
+        return request(app)
+          .delete('/api/comments/invalid_id') 
+          .expect(400)
+          .then(({ body }) => {
+            
+            
+            expect(body.msg).toBe("Bad Request");
+          });
+      });
+
   });
