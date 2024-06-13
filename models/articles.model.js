@@ -1,9 +1,14 @@
 const db = require("../db/connection")
 
 
-exports.fetchArticles = () => {
+exports.fetchArticles = (topic) => {
+
+    if(topic){
+        return db.query(`SELECT * FROM articles WHERE topic = $1`, [topic])
+    }
+
     return db.query(
-`SELECT   
+   `SELECT   
     articles.article_id, 
     articles.title, 
     articles.topic, 
@@ -24,6 +29,8 @@ ORDER BY
         return articles
     })
 }
+
+
 
 
 exports.fetchArticleID = (article_id) => {  

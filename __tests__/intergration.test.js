@@ -11,9 +11,9 @@ beforeEach(() => {
     return seed(data)
   })
   
- // afterAll(() => db.end())
+ 
  afterAll(() => {
-    return db.end(); // Ensure this properly closes your DB connection
+    return db.end(); 
 });
 
 
@@ -72,6 +72,7 @@ describe("GET /api/articles/:article_id", () => {
                 created_at: expect.any(String),
                 votes: expect.any(Number),
                 article_img_url: expect.any(String)
+                
             })
         })
     })
@@ -341,6 +342,7 @@ describe('POST /api/articles/:article_id/comments', () => {
                    created_at: expect.any(String),
                    votes: -1,
                    article_img_url: expect.any(String)
+                   
                })
            })
         });
@@ -413,7 +415,7 @@ describe('POST /api/articles/:article_id/comments', () => {
           .then(({ body }) => {
 
         expect(body.msg).toBe('Comment not found');
-        
+
           });
       });
 
@@ -429,3 +431,58 @@ describe('POST /api/articles/:article_id/comments', () => {
       });
 
   });
+
+
+  describe('GET: /api/users', () => {
+    test('200: returns all users', () => {
+        return request(app)
+        .get("/api/users")
+        .expect(200)
+        .then(({ body }) => {
+
+            
+            const { users } = body
+            
+
+            expect(users).toHaveLength(4)
+            users.forEach((user) => {
+                expect(user).toMatchObject({
+                    username: expect.any(String),
+                    name: expect.any(String),
+                    avatar_url: expect.any(String)
+                })
+            })
+            
+           
+        })
+    });
+    test('404: when incorrect spelling on path respond with message', () => {
+        return request(app)
+        .get("/api/user")
+        .expect(404)
+        .then(({ body }) => {
+            const { msg } = body
+            expect(msg).toBe("Could not find page")
+        })
+    });
+  });
+
+
+  describe('GET: /api/articles?topic', () => {
+    test('200: get articles with "cats" as its topic', () => {
+        return request(app)
+        .get("/api/articles?topic=mitch")
+        .expect(200)
+        .then(({body}) => {
+            const articles = body.rows;
+
+           console.log(articles)
+         articles.forEach((article) => {
+               
+         expect(article.topic).toBe('mitch');
+         });
+        })
+    });
+  });
+
+  
